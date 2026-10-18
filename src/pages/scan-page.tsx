@@ -1,6 +1,7 @@
 import { Camera, Copy, RotateCcw, RotateCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DropZone } from '@/components/drop-zone'
+import { LibrarySaveActions } from '@/components/library-save'
 import { Notice } from '@/components/notice'
 import { ToolFrame, ToolHeading } from '@/components/tool-heading'
 import { Button } from '@/components/ui/button'
@@ -34,6 +35,7 @@ export function ScanPage() {
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
+  const [libraryFile, setLibraryFile] = useState<{ blob: Blob; name: string; mime: string } | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
   const [adjusted, setAdjusted] = useState<Blob | null>(null)
   const [enhanced, setEnhanced] = useState<Blob | null>(null)
@@ -435,7 +437,11 @@ export function ScanPage() {
             <Button type="button" variant="outline" disabled={!file || running} onClick={() => void downloadPdf().catch((error: unknown) => setPrepareError(error instanceof Error ? error.message : 'The PDF could not be created.'))}>
               Download PDF
             </Button>
+            <Button type="button" variant="outline" disabled={!file || running} onClick={() => void workingBlob().then((blob) => setLibraryFile({ blob, name: safeFileName(file?.name.replace(/\.[^.]+$/, '') || 'scan', extensionFor(blob)), mime: blob.type || 'image/jpeg' })).catch((error: unknown) => setPrepareError(error instanceof Error ? error.message : 'The scan could not be prepared.'))}>
+              Prepare library copy
+            </Button>
           </div>
+          <LibrarySaveActions blob={libraryFile?.blob ?? null} filename={libraryFile?.name ?? 'scan.jpg'} mime={libraryFile?.mime ?? 'image/jpeg'} />
           {copyMessage ? <p className="text-xs text-muted-foreground">{copyMessage}</p> : null}
         </div>
       </div>

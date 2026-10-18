@@ -17,6 +17,7 @@ import { SignupPage } from '@/pages/signup-page'
 import { ToolsPage } from '@/pages/tools-page'
 import { UnavailableToolPage } from '@/pages/unavailable-tool-page'
 
+const DocumentsPage = lazy(() => import('@/pages/documents-page').then((module) => ({ default: module.DocumentsPage })))
 const ImageResizePage = lazy(() => import('@/pages/image-resize-page').then((module) => ({ default: module.ImageResizePage })))
 const CompressPdfPage = lazy(() => import('@/pages/compress-pdf-page').then((module) => ({ default: module.CompressPdfPage })))
 const MergePdfPage = lazy(() => import('@/pages/merge-pdf-page').then((module) => ({ default: module.MergePdfPage })))
@@ -32,6 +33,7 @@ export default function App() {
     <Routes>
       <Route element={<SiteShell />}>
         <Route index element={<HomePage />} />
+        <Route path="documents" element={<DocumentsPage />} />
         <Route path="tools" element={<ToolsPage />} />
         <Route path="tools/image-resize" element={<ImageResizePage />} />
         <Route path="tools/compress-pdf" element={<CompressPdfPage />} />

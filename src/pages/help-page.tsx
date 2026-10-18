@@ -20,7 +20,7 @@ const questions = [
   },
   {
     q: 'Do I need an account?',
-    a: 'The tools work without an account. Signing in stores your name, email, and file-history metadata. Document contents are not uploaded.',
+    a: 'The tools and the local document library work without an account. Signing in stores your name, email, and file-history metadata. A document is uploaded only when you explicitly copy it to the online library.',
   },
 ]
 

@@ -1,5 +1,6 @@
 import { Upload } from 'lucide-react'
-import type { DragEvent, ReactNode } from 'react'
+import { useEffect, useRef, type DragEvent, type ReactNode } from 'react'
+import { consumeStagedFile } from '@/lib/library-stage'
 import { cn } from '@/lib/utils'
 
 type DropZoneProps = {
@@ -13,6 +14,22 @@ type DropZoneProps = {
 }
 
 export function DropZone({ accept, multiple = false, title, detail, onFiles, selected, testId = 'dropzone' }: DropZoneProps) {
+  const onFilesRef = useRef(onFiles)
+
+  useEffect(() => {
+    onFilesRef.current = onFiles
+  }, [onFiles])
+
+  useEffect(() => {
+    void consumeStagedFile().then((file) => {
+      if (!file) return
+      const accepted = accept.split(',').map((item) => item.trim().toLowerCase())
+      const name = file.name.toLowerCase()
+      const matches = accepted.some((item) => item === file.type || (item.startsWith('.') && name.endsWith(item)) || (item.endsWith('/*') && file.type.startsWith(item.slice(0, -1))))
+      if (matches) onFilesRef.current([file])
+    }).catch(() => undefined)
+  }, [accept])
+
   function handleDrop(event: DragEvent<HTMLLabelElement>) {
     event.preventDefault()
     onFiles(Array.from(event.dataTransfer.files))

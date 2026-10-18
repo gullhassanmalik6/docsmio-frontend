@@ -54,7 +54,7 @@ export function SiteFooter() {
         <div>
           <h2 className="text-sm font-semibold">Privacy</h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Supported files are processed on your device. A signed-in account can store filenames and sizes, not the documents themselves. Downloaded files stay in this browser until you remove them.
+            Supported tools process files on your device. A signed-in account stores filenames and sizes for tool history. Document bytes are uploaded only when you copy a file into the online library.
           </p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>

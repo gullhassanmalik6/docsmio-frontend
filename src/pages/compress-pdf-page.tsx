@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { DropZone } from '@/components/drop-zone'
+import { LibrarySaveActions } from '@/components/library-save'
 import { Notice } from '@/components/notice'
 import { ToolFrame, ToolHeading } from '@/components/tool-heading'
 import { Button } from '@/components/ui/button'
@@ -218,6 +219,7 @@ export function CompressPdfPage() {
           <Button type="button" className="w-full" data-testid="download-output" disabled={!result?.blob} onClick={() => result?.blob && downloadBlob(result.blob, filename || 'document_compressed.pdf')}>
             {result?.blob ? `Download PDF · ${formatBytes(result.blob.size)}` : 'Download PDF'}
           </Button>
+          <LibrarySaveActions blob={result?.blob ?? null} filename={filename || 'document_compressed.pdf'} mime="application/pdf" />
         </div>
       </form>
     </ToolFrame>

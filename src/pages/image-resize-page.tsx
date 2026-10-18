@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { DropZone } from '@/components/drop-zone'
+import { LibrarySaveActions } from '@/components/library-save'
 import { ImageComparison } from '@/components/image-comparison'
 import { Notice } from '@/components/notice'
 import { ToolFrame, ToolHeading } from '@/components/tool-heading'
@@ -409,6 +410,7 @@ export function ImageResizePage() {
             {mutation.isPending ? 'Processing…' : 'Resize Image'}
           </Button>
         </div>
+        <LibrarySaveActions blob={output?.blob ?? null} filename={output?.filename ?? 'image'} mime={output?.blob.type || 'image/jpeg'} />
       </form>
     </ToolFrame>
   )

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 
 const links = [
   { to: '/', label: 'Home', end: true },
+  { to: '/documents', label: 'My Documents', end: false },
   { to: '/tools', label: 'Tools', end: false },
   { to: '/features', label: 'Features', end: false },
   { to: '/pricing', label: 'Pricing', end: false },

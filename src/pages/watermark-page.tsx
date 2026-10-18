@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { DropZone } from '@/components/drop-zone'
+import { LibrarySaveActions } from '@/components/library-save'
 import { Notice } from '@/components/notice'
 import { ToolFrame, ToolHeading } from '@/components/tool-heading'
 import { Button } from '@/components/ui/button'
@@ -112,6 +113,7 @@ export function WatermarkPage() {
           <Button type="button" variant="outline" className="w-full" data-testid="download-output" disabled={!output} onClick={() => output && downloadBlob(output.blob, output.name)}>
             Download PDF
           </Button>
+          <LibrarySaveActions blob={output?.blob ?? null} filename={output?.name ?? 'watermarked.pdf'} mime="application/pdf" />
         </div>
       </form>
     </ToolFrame>

@@ -3,6 +3,7 @@ import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DropZone } from '@/components/drop-zone'
+import { LibrarySaveActions } from '@/components/library-save'
 import { Notice } from '@/components/notice'
 import { ToolFrame, ToolHeading } from '@/components/tool-heading'
 import { Button } from '@/components/ui/button'
@@ -318,6 +319,7 @@ export function ConvertPage() {
                   <Button type="button" variant="outline" data-testid="download-output" onClick={() => downloadBlob(output.blob, output.name)}>
                     Download
                   </Button>
+                  <LibrarySaveActions blob={output.blob} filename={output.name} mime={output.blob.type || 'application/octet-stream'} />
                 </li>
               ))}
             </ul>

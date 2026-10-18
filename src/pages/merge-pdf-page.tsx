@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { DropZone } from '@/components/drop-zone'
+import { LibrarySaveActions } from '@/components/library-save'
 import { Notice } from '@/components/notice'
 import { ToolFrame, ToolHeading } from '@/components/tool-heading'
 import { Button } from '@/components/ui/button'
@@ -193,6 +194,7 @@ export function MergePdfPage() {
           <Button type="button" variant="outline" className="w-full" data-testid="download-output" disabled={!output} onClick={() => output && downloadBlob(output, savedName)}>
             Download merged PDF
           </Button>
+          <LibrarySaveActions blob={output} filename={savedName} mime="application/pdf" />
         </form>
       </div>
     </ToolFrame>

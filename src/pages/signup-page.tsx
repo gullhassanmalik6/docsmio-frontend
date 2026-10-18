@@ -42,7 +42,7 @@ export function SignupPage() {
     <div className="mx-auto w-full max-w-md px-4 py-16">
       <div className="rounded-3xl border border-white/10 bg-card p-6 sm:p-8">
         <h1 className="text-3xl font-semibold tracking-tight">Sign up</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Create an account to keep a history of filenames and sizes. Document tools do not require an account, and files are not uploaded.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Create an account to keep a history of filenames and sizes, and to use the online library. Document tools and the local library do not require an account. Files are uploaded only when you choose to copy them online.</p>
         <form
           className="mt-6 space-y-4"
           noValidate
