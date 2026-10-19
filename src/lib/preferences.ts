@@ -12,7 +12,8 @@ export const defaultPreferences: Preferences = {
   defaultTargetKb: 200,
 }
 
-const STORAGE_KEY = 'docufix.preferences'
+const STORAGE_KEY = 'docsmio.preferences'
+const LEGACY_STORAGE_KEY = 'docufix.preferences'
 
 function clamp(value: unknown, min: number, max: number, fallback: number): number {
   const number = typeof value === 'number' ? value : Number(value)
@@ -22,7 +23,8 @@ function clamp(value: unknown, min: number, max: number, fallback: number): numb
 
 export function loadPreferences(): Preferences {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY)
+    if (raw && !localStorage.getItem(STORAGE_KEY)) localStorage.setItem(STORAGE_KEY, raw)
     if (!raw) return defaultPreferences
     const parsed = JSON.parse(raw) as Partial<Preferences>
     const format = parsed.defaultFormat

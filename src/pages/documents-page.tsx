@@ -46,10 +46,12 @@ type PendingFile = {
   error: string | null
 }
 
-const MODE_KEY = 'docufix.library.mode'
+const MODE_KEY = 'docsmio.library.mode'
 
 function storedMode(): Mode {
-  return window.localStorage.getItem(MODE_KEY) === 'online' ? 'online' : 'local'
+  const saved = window.localStorage.getItem(MODE_KEY) ?? window.localStorage.getItem('docufix.library.mode')
+  if (saved && !window.localStorage.getItem(MODE_KEY)) window.localStorage.setItem(MODE_KEY, saved)
+  return saved === 'online' ? 'online' : 'local'
 }
 
 function mapFolder(folder: OnlineFolder): LibraryFolder {

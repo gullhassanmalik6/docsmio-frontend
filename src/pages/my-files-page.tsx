@@ -15,7 +15,7 @@ type KindFilter = 'all' | 'image' | 'pdf'
 type StatusFilter = 'all' | 'ready'
 
 export function MyFilesPage() {
-  usePageTitle('My Files — DocuFix')
+  usePageTitle('My Files — Docsmio')
   const history = useHistory()
   const auth = useAuth()
   const queryClient = useQueryClient()

@@ -7,7 +7,7 @@ import { getTool } from '@/lib/tools'
 
 export function UnavailableToolPage({ slug }: { slug: string }) {
   const tool = getTool(slug)
-  usePageTitle(tool ? `${tool.title} — DocuFix` : 'Tool — DocuFix')
+  usePageTitle(tool ? `${tool.title} — Docsmio` : 'Tool — Docsmio')
 
   if (!tool) {
     return (
@@ -19,8 +19,8 @@ export function UnavailableToolPage({ slug }: { slug: string }) {
 
   const detail =
     slug === 'pdf-to-word'
-      ? 'DocuFix does not convert a PDF into an editable Word document. Extracting plain text would drop layout, fonts, and images, so this page will not rename the file or produce a download.'
-      : 'DocuFix does not convert a Word document into a PDF. That needs a document engine, which is not installed, so this page will not accept a .docx upload or pretend a renamed file is a PDF.'
+      ? 'Docsmio does not convert a PDF into an editable Word document. Extracting plain text would drop layout, fonts, and images, so this page will not rename the file or produce a download.'
+      : 'Docsmio does not convert a Word document into a PDF. That needs a document engine, which is not installed, so this page will not accept a .docx upload or pretend a renamed file is a PDF.'
 
   return (
     <ToolFrame>

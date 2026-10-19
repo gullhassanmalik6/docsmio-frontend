@@ -30,7 +30,7 @@ const plans = [
 ]
 
 export function PricingPage() {
-  usePageTitle('Pricing — DocuFix')
+  usePageTitle('Pricing — Docsmio')
   const auth = useAuth()
   const [yearly, setYearly] = useState(false)
   const [notice, setNotice] = useState(false)

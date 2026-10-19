@@ -7,7 +7,7 @@ import { cn, fieldClass } from '@/lib/utils'
 import { Link } from 'react-router-dom'
 
 export function ToolsPage() {
-  usePageTitle('Tools — DocuFix')
+  usePageTitle('Tools — Docsmio')
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
   const categoryParam = params.get('category')

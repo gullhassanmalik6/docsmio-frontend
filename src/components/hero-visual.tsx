@@ -10,7 +10,7 @@ export function HeroVisual() {
           <span className="size-2.5 rounded-full bg-red-400/80" />
           <span className="size-2.5 rounded-full bg-amber-300/80" />
           <span className="size-2.5 rounded-full bg-emerald-400/80" />
-          <span className="ml-2 text-xs text-muted-foreground">DocuFix — Your files, ready to go</span>
+          <span className="ml-2 text-xs text-muted-foreground">Docsmio — Your files, ready to go</span>
         </div>
         <div className="grid gap-3 p-3 sm:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-4">

@@ -27,7 +27,7 @@ const schema = z.object({
 type WatermarkForm = z.infer<typeof schema>
 
 export function WatermarkPage() {
-  usePageTitle('Add Watermark — DocuFix')
+  usePageTitle('Add Watermark — Docsmio')
   const { addOutput } = useHistory()
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
@@ -36,7 +36,7 @@ export function WatermarkPage() {
   const previewUrl = useObjectUrl(preview)
   const form = useForm<WatermarkForm>({
     resolver: zodResolver(schema),
-    defaultValues: { text: 'DOCUFIX', filename: 'Watermarked.pdf', opacity: 30, fontSize: 48 },
+    defaultValues: { text: 'DOCSMIO', filename: 'Watermarked.pdf', opacity: 30, fontSize: 48 },
   })
 
   const mutation = useMutation({

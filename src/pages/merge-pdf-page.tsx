@@ -38,7 +38,7 @@ type MergeItem = {
 }
 
 export function MergePdfPage() {
-  usePageTitle('Merge PDF — DocuFix')
+  usePageTitle('Merge PDF — Docsmio')
   const { addOutput } = useHistory()
   const [items, setItems] = useState<MergeItem[]>([])
   const [listError, setListError] = useState<string | null>(null)

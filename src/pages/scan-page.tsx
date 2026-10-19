@@ -27,7 +27,7 @@ function extensionFor(blob: Blob): string {
 }
 
 export function ScanPage() {
-  usePageTitle('Scan & OCR — DocuFix')
+  usePageTitle('Scan & OCR — Docsmio')
   const { addOutput } = useHistory()
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -394,7 +394,7 @@ export function ScanPage() {
               ))}
             </select>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              The OCR engine and language files download when you extract text, so this step needs a network connection. The image and the transcript stay in this browser and are not sent to DocuFix.
+              The OCR engine and language files download when you extract text, so this step needs a network connection. The image and the transcript stay in this browser and are not sent to Docsmio.
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 text-sm">

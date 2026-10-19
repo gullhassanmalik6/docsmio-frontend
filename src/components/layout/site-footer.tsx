@@ -77,7 +77,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© 2026 DocuFix. Smart Document Tool.</p>
+          <p>© 2026 Docsmio. Smart Document Tool.</p>
           <p>No account is required for the tools that are ready.</p>
         </div>
       </div>

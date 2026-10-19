@@ -76,7 +76,7 @@ type SourceState = {
 }
 
 export function ImageResizePage() {
-  usePageTitle('Image Resize & Compress — DocuFix')
+  usePageTitle('Image Resize & Compress — Docsmio')
   const preferences = loadPreferences()
   const { addOutput } = useHistory()
   const aspectRef = useRef(1)

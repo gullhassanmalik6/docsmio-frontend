@@ -8,7 +8,7 @@ export function Logo({ className }: { className?: string }) {
       <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow-[0_0_22px_rgba(34,197,94,0.45)]">
         <FileCheck2 className="size-5" />
       </span>
-      <span className="text-lg">DocuFix</span>
+      <span className="text-lg">Docsmio</span>
     </Link>
   )
 }

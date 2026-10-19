@@ -30,7 +30,7 @@ const schema = z.object({
 type SplitForm = z.infer<typeof schema>
 
 export function SplitPdfPage() {
-  usePageTitle('Split PDF — DocuFix')
+  usePageTitle('Split PDF — Docsmio')
   const { addOutput } = useHistory()
   const [file, setFile] = useState<File | null>(null)
   const [pages, setPages] = useState<number | null>(null)

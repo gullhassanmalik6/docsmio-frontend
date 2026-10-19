@@ -1,3 +1,4 @@
+import { copyLegacyDatabase } from '@/lib/legacy-db'
 import { defaultFolders, uniqueFileName, type Classification, type LibraryFolderKey } from '@/lib/library-rules'
 
 export type LibraryFolder = {
@@ -23,10 +24,11 @@ export type LibraryDocument = {
 
 type StoredDocument = LibraryDocument & { blob: Blob }
 
-const DB_NAME = 'docufix-library'
+const DB_NAME = 'docsmio-library'
 const DB_VERSION = 2
 
-function openDatabase(): Promise<IDBDatabase> {
+async function openDatabase(): Promise<IDBDatabase> {
+  await copyLegacyDatabase('docufix-library', DB_NAME, DB_VERSION, ['folders', 'documents', 'staged'])
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION)
     request.onupgradeneeded = () => {

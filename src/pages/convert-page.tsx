@@ -44,7 +44,7 @@ function ImagePreview({ file }: { file: File }) {
 }
 
 export function ConvertPage() {
-  usePageTitle('Convert Files — DocuFix')
+  usePageTitle('Convert Files — Docsmio')
   const { addOutput } = useHistory()
   const [source, setSource] = useState<ConvertFormat>('jpeg')
   const [target, setTarget] = useState<ConvertFormat>('png')

@@ -1,3 +1,5 @@
+import { copyLegacyDatabase } from '@/lib/legacy-db'
+
 export type HistoryKind = 'image' | 'pdf'
 
 export type HistoryItem = {
@@ -13,13 +15,14 @@ export type HistoryItem = {
 
 type HistoryRecord = HistoryItem & { blob: Blob }
 
-const DB_NAME = 'docufix'
+const DB_NAME = 'docsmio'
 const STORE = 'outputs'
 
 let memoryMode = false
 let memoryRecords: HistoryRecord[] = []
 
-function openDatabase(): Promise<IDBDatabase> {
+async function openDatabase(): Promise<IDBDatabase> {
+  await copyLegacyDatabase('docufix', DB_NAME, 1, [STORE])
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, 1)
     request.onupgradeneeded = () => {

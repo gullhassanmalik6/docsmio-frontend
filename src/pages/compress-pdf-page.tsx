@@ -45,7 +45,7 @@ const modes = [
 ] as const
 
 export function CompressPdfPage() {
-  usePageTitle('Compress PDF — DocuFix')
+  usePageTitle('Compress PDF — Docsmio')
   const { addOutput } = useHistory()
   const [file, setFile] = useState<File | null>(null)
   const [pageCount, setPageCount] = useState<number | null>(null)

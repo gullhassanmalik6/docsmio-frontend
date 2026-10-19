@@ -28,7 +28,7 @@ type PdfForm = z.infer<typeof schema>
 
 export function ImageToPdfPage({ mode }: { mode: 'jpeg' | 'image' }) {
   const title = mode === 'jpeg' ? 'JPG to PDF' : 'Image to PDF'
-  usePageTitle(`${title} — DocuFix`)
+  usePageTitle(`${title} — Docsmio`)
   const { addOutput } = useHistory()
   const [files, setFiles] = useState<File[]>([])
   const [fileError, setFileError] = useState<string | null>(null)

@@ -1,4 +1,6 @@
-const DB_NAME = 'docufix-library'
+import { copyLegacyDatabase } from '@/lib/legacy-db'
+
+const DB_NAME = 'docsmio-library'
 const STORE = 'staged'
 
 export async function stageForTool(file: { name: string; mime: string; blob: Blob }): Promise<void> {
@@ -28,7 +30,8 @@ export async function consumeStagedFile(): Promise<File | null> {
   return new File([record.blob], record.name, { type: record.mime })
 }
 
-function openStageDatabase(): Promise<IDBDatabase> {
+async function openStageDatabase(): Promise<IDBDatabase> {
+  await copyLegacyDatabase('docufix-library', DB_NAME, 2, ['folders', 'documents', 'staged'])
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, 2)
     request.onupgradeneeded = () => {

@@ -50,7 +50,7 @@ const formats = [
 ]
 
 export function HomePage() {
-  usePageTitle('DocuFix — Smart Document Tool')
+  usePageTitle('Docsmio — Smart Document Tool')
   const popular = tools.filter((tool) => tool.status === 'ready').slice(0, 6)
 
   return (

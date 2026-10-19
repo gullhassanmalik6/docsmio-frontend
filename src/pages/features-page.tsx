@@ -5,7 +5,7 @@ import { usePageTitle } from '@/hooks/use-browser'
 const features = [
   {
     title: 'Target-size image compression',
-    copy: 'Enter kilobytes or megabytes. DocuFix searches JPEG and WebP quality, then scales the image only if the target is still missed. The page reports the real byte size.',
+    copy: 'Enter kilobytes or megabytes. Docsmio searches JPEG and WebP quality, then scales the image only if the target is still missed. The page reports the real byte size.',
   },
   {
     title: 'Resize with an aspect lock',
@@ -30,13 +30,13 @@ const features = [
 ]
 
 export function FeaturesPage() {
-  usePageTitle('Features — DocuFix')
+  usePageTitle('Features — Docsmio')
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
       <p className="text-xs font-semibold tracking-[0.16em] text-emerald-300">FEATURES</p>
       <h1 className="mt-2 max-w-2xl text-4xl font-semibold tracking-tight">A smaller toolbox that tells the truth about the file</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
-        DocuFix is for the upload that has a size limit, a page limit, or a format rule. The ready tools run in the browser. The ones that would damage a document are marked unavailable.
+        Docsmio is for the upload that has a size limit, a page limit, or a format rule. The ready tools run in the browser. The ones that would damage a document are marked unavailable.
       </p>
       <div className="mt-10 grid gap-4 md:grid-cols-2">
         {features.map((feature) => (

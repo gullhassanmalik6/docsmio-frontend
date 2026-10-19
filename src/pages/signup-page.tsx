@@ -26,7 +26,7 @@ const signupSchema = z
 type SignupValues = z.infer<typeof signupSchema>
 
 export function SignupPage() {
-  usePageTitle('Sign up — DocuFix')
+  usePageTitle('Sign up — Docsmio')
   const auth = useAuth()
   const navigate = useNavigate()
   const form = useForm<SignupValues>({

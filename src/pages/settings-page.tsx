@@ -19,7 +19,7 @@ const schema = z.object({
 type SettingsForm = z.infer<typeof schema>
 
 export function SettingsPage() {
-  usePageTitle('Settings — DocuFix')
+  usePageTitle('Settings — Docsmio')
   const [saved, setSaved] = useState(false)
   const form = useForm<SettingsForm>({ resolver: zodResolver(schema), defaultValues: loadPreferences() })
 

@@ -8,7 +8,7 @@ const questions = [
   },
   {
     q: 'Why did PDF compression not get smaller?',
-    a: 'Low mode only rewrites the PDF container. If the images inside were already compressed, the size stays put and DocuFix will not pretend otherwise. Balanced and High rebuild pages as images and remove selectable text.',
+    a: 'Low mode only rewrites the PDF container. If the images inside were already compressed, the size stays put and Docsmio will not pretend otherwise. Balanced and High rebuild pages as images and remove selectable text.',
   },
   {
     q: 'Can I turn a PDF into Word?',
@@ -16,7 +16,7 @@ const questions = [
   },
   {
     q: 'Does scan read the text?',
-    a: 'Yes, after you capture or upload an image. Tesseract.js reads it in this browser. Review the text, because OCR can be wrong. The image is not uploaded to DocuFix.',
+    a: 'Yes, after you capture or upload an image. Tesseract.js reads it in this browser. Review the text, because OCR can be wrong. The image is not uploaded to Docsmio.',
   },
   {
     q: 'Do I need an account?',
@@ -25,7 +25,7 @@ const questions = [
 ]
 
 export function HelpPage() {
-  usePageTitle('Help — DocuFix')
+  usePageTitle('Help — Docsmio')
   return (
     <div className="max-w-2xl">
       <h1 className="text-3xl font-semibold tracking-tight">Help & Support</h1>

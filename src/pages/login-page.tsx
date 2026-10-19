@@ -19,7 +19,7 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>
 
 export function LoginPage() {
-  usePageTitle('Login — DocuFix')
+  usePageTitle('Login — Docsmio')
   const auth = useAuth()
   const navigate = useNavigate()
   const form = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: '', password: '' } })

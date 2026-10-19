@@ -5,7 +5,7 @@ import { usePageTitle } from '@/hooks/use-browser'
 export function BlogArticlePage() {
   const { slug } = useParams()
   const article = slug ? getArticle(slug) : undefined
-  usePageTitle(article ? `${article.title} — DocuFix` : 'Article — DocuFix')
+  usePageTitle(article ? `${article.title} — Docsmio` : 'Article — Docsmio')
 
   if (!article) {
     return (
