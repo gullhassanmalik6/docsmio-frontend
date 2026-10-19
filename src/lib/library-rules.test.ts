@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { classifyFileName, folderMoveError, libraryFileError, uniqueFileName } from '@/lib/library-rules'
+import { shareFallbackNote } from '@/lib/library-share'
 
 describe('document library rules', () => {
   it('suggests a folder from the filename and leaves ambiguous files uncategorized', () => {
@@ -32,5 +33,12 @@ describe('document library rules', () => {
     expect(folderMoveError(folders, 'a', 'a')).toMatch(/itself/)
     expect(folderMoveError(folders, 'a', 'c')).toMatch(/subfolders/)
     expect(folderMoveError(folders, 'c', 'a')).toBeNull()
+  })
+
+  it('does not claim a file was attached when the browser cannot hand it off', () => {
+    expect(shareFallbackNote('whatsapp')).toMatch(/downloaded/)
+    expect(shareFallbackNote('whatsapp')).toMatch(/cannot place the file/)
+    expect(shareFallbackNote('email')).toMatch(/cannot carry the file/)
+    expect(shareFallbackNote('other')).toMatch(/downloaded/)
   })
 })

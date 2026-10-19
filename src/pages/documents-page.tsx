@@ -1,4 +1,4 @@
-import { Cloud, Download, FolderPlus, HardDrive, LayoutGrid, List, Search, Star, Trash2, Upload } from 'lucide-react'
+import { Cloud, Download, FolderPlus, HardDrive, LayoutGrid, List, Mail, MessageCircle, Search, Share2, Star, Trash2, Upload } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -7,6 +7,7 @@ import { useAuth } from '@/context/auth-context'
 import { api, downloadLibraryDocument, uploadLibraryDocument, type OnlineDocument, type OnlineFolder } from '@/lib/api'
 import { downloadBlob, formatBytes, formatDate } from '@/lib/format'
 import { classifyFileName, folderMoveError, libraryFileError, type Classification } from '@/lib/library-rules'
+import { shareDocumentFile, shareFallbackNote, type ShareTarget } from '@/lib/library-share'
 import { stageForTool } from '@/lib/library-stage'
 import {
   createFolder,
@@ -97,6 +98,8 @@ export function DocumentsPage() {
   const [newFolder, setNewFolder] = useState('')
   const [preview, setPreview] = useState<{ name: string; url: string; mime: string } | null>(null)
   const [moveTarget, setMoveTarget] = useState('')
+  const [shareFor, setShareFor] = useState<string | null>(null)
+  const preparedShare = useRef<{ id: string; file: File } | null>(null)
 
   function run(action: () => Promise<unknown>) {
     void action().catch((caught: unknown) => {
@@ -226,6 +229,32 @@ export function DocumentsPage() {
       return
     }
     setPreview({ name: row.name, url: URL.createObjectURL(blob), mime: blob.type || row.mime })
+  }
+
+  async function shareRow(row: Row, target: ShareTarget) {
+    let file = preparedShare.current?.id === row.id ? preparedShare.current.file : null
+    if (!file) {
+      const blob = await blobFor(row)
+      file = new File([blob], row.name, { type: blob.type || row.mime })
+      preparedShare.current = { id: row.id, file }
+    }
+    const result = await shareDocumentFile(file)
+    if (result === 'cancelled') return
+    if (result === 'shared') {
+      setShareFor(null)
+      setNotice(`“${file.name}” was handed to the app you chose.`)
+      return
+    }
+    if (result === 'retry') {
+      setNotice('Tap the same share button again. The file is ready for WhatsApp, email, or another app.')
+      return
+    }
+    downloadBlob(file, file.name)
+    if (target === 'whatsapp') window.open('https://web.whatsapp.com/', '_blank', 'noopener,noreferrer')
+    if (target === 'email') {
+      window.location.href = `mailto:?subject=${encodeURIComponent(file.name)}&body=${encodeURIComponent('Attach the downloaded file before sending.')}`
+    }
+    setNotice(shareFallbackNote(target))
   }
 
   async function downloadRow(row: Row) {
@@ -526,6 +555,15 @@ export function DocumentsPage() {
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button type="button" size="sm" variant="outline" onClick={() => run(() => previewRow(document))}>Preview</Button>
                   <Button type="button" size="sm" variant="outline" onClick={() => run(() => downloadRow(document))}><Download className="size-3.5" /> Download</Button>
+                  <Button type="button" size="sm" variant="outline" aria-expanded={shareFor === document.id} onClick={() => setShareFor((current) => current === document.id ? null : document.id)}><Share2 className="size-3.5" /> Share</Button>
+                  {shareFor === document.id ? (
+                    <div className="flex w-full flex-wrap gap-2 rounded-2xl border border-white/10 bg-black/20 p-2">
+                      <Button type="button" size="sm" variant="outline" onClick={() => run(() => shareRow(document, 'whatsapp'))}><MessageCircle className="size-3.5" /> WhatsApp</Button>
+                      <Button type="button" size="sm" variant="outline" onClick={() => run(() => shareRow(document, 'email'))}><Mail className="size-3.5" /> Email</Button>
+                      <Button type="button" size="sm" variant="outline" onClick={() => run(() => shareRow(document, 'other'))}>Other app</Button>
+                      <p className="w-full text-xs text-muted-foreground">The file is sent only if your browser opens a share window. Otherwise it is downloaded so you can attach it.</p>
+                    </div>
+                  ) : null}
                   <Button type="button" size="sm" variant="outline" onClick={() => run(() => renameRow(document))}>Rename</Button>
                   <select aria-label={`Move ${document.name}`} className="h-9 rounded-full border border-white/10 bg-transparent px-2 text-xs" defaultValue="" onChange={(event) => { const value = event.target.value; event.target.value = ''; run(() => moveRows([document.id], value)) }}>
                     <option value="" disabled>Move</option>
