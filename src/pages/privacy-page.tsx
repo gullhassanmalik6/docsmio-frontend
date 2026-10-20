@@ -10,7 +10,8 @@ export function PrivacyPage() {
         <p>Image resize, PDF merge, split, watermark, and the enabled conversions run in your browser. The file you pick is not uploaded for those tools.</p>
         <p>My Files keeps downloadable outputs in this browser. If you are signed in, Docsmio can also save a history record with the filename, operation, and sizes. That history record does not contain the file. The online library is separate: a file is stored for your account only after you confirm an upload, and another account cannot download it.</p>
         <p>The local library uses this browser’s storage. Clearing site data removes those files. It is not synced to other devices and it is not an encrypted vault.</p>
-        <p>Pricing buttons do not start a payment. OCR reads an image in this browser and does not upload the photo or the transcript.</p>
+        <p>Pricing buttons do not start a payment. Tool OCR reads an image in this browser and does not upload that photo. If you later choose “Read image text” on an online document, the transcript is saved to your account so search works on another device. It is not sent to an external AI service.</p>
+        <p>Online files are not end-to-end encrypted. The server stores them so you can download them after you sign in. Share links are off until you create one. A recipient can keep a copy after you revoke the link.</p>
         <p>Docsmio does not add analytics that record document contents. File names you type, such as an export name, stay on the device with the output.</p>
         <p>
           Questions about a limit belong on the <Link className="text-primary" to="/help">help page</Link>.

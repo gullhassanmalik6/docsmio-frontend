@@ -14,7 +14,7 @@ export function WorkspaceShell() {
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[220px_1fr]">
       <aside className="h-fit rounded-2xl border border-white/10 bg-card p-3 lg:sticky lg:top-24">
-        <p className="px-3 pb-2 text-xs font-semibold tracking-[0.16em] text-emerald-300/80">WORKSPACE</p>
+        <p className="px-3 pb-2 text-xs font-semibold tracking-[0.16em] text-primary">WORKSPACE</p>
         <nav aria-label="Workspace" className="flex gap-1 overflow-x-auto lg:flex-col">
           {items.map((item) => (
             <NavLink
@@ -23,7 +23,7 @@ export function WorkspaceShell() {
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm',
-                  isActive ? 'bg-primary/15 text-emerald-200' : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
+                  isActive ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
                 )
               }
             >

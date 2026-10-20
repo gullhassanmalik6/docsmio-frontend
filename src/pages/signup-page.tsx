@@ -35,7 +35,7 @@ export function SignupPage() {
   })
   const mutation = useMutation({
     mutationFn: (values: SignupValues) => auth.register({ name: values.name, email: values.email, password: values.password }),
-    onSuccess: () => navigate('/files'),
+    onSuccess: () => navigate('/onboarding'),
   })
 
   return (

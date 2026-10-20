@@ -6,8 +6,13 @@ import { BlogArticlePage } from '@/pages/blog-article-page'
 import { BlogPage } from '@/pages/blog-page'
 import { FeaturesPage } from '@/pages/features-page'
 import { HelpPage } from '@/pages/help-page'
+import { CategoriesPage } from '@/pages/categories-page'
 import { HomePage } from '@/pages/home-page'
 import { LoginPage } from '@/pages/login-page'
+import { OnboardingPage } from '@/pages/onboarding-page'
+import { RemindersPage } from '@/pages/reminders-page'
+import { SharingPage } from '@/pages/sharing-page'
+import { WalletPage } from '@/pages/wallet-page'
 import { MyFilesPage } from '@/pages/my-files-page'
 import { NotFoundPage } from '@/pages/not-found-page'
 import { PricingPage } from '@/pages/pricing-page'
@@ -33,7 +38,12 @@ export default function App() {
     <Routes>
       <Route element={<SiteShell />}>
         <Route index element={<HomePage />} />
+        <Route path="wallet" element={<WalletPage />} />
+        <Route path="onboarding" element={<OnboardingPage />} />
         <Route path="documents" element={<DocumentsPage />} />
+        <Route path="categories" element={<CategoriesPage />} />
+        <Route path="reminders" element={<RemindersPage />} />
+        <Route path="sharing" element={<SharingPage />} />
         <Route path="tools" element={<ToolsPage />} />
         <Route path="tools/image-resize" element={<ImageResizePage />} />
         <Route path="tools/compress-pdf" element={<CompressPdfPage />} />

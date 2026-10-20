@@ -6,16 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Docsmio prepares images and PDFs for upload. Resize, compress to a target size, merge, split, and export a new file."
+      content="Docsmio keeps personal documents in a private wallet and offers separate PDF and image tools. Files stay private unless you share them."
     />
     <meta name="theme-color" content="#070b09" />
+    <script>
+      try {
+        var storedMode = localStorage.getItem('docsmio.app.mode')
+        document.documentElement.dataset.appMode = storedMode === 'tools' ? 'tools' : 'wallet'
+      } catch (error) {
+        document.documentElement.dataset.appMode = 'wallet'
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>Docsmio — Smart Document Tool</title>
+    <title>Docsmio — Document Wallet</title>
   </head>
   <body>
     <div id="root"></div>

@@ -48,7 +48,29 @@
   --border: rgb(255 255 255 / 0.08);
   --input: rgb(255 255 255 / 0.12);
   --ring: #22c55e;
+  --primary-glow: rgb(34 197 94 / 0.28);
   color-scheme: dark;
+}
+
+:root[data-app-mode='tools'] {
+  --background: #0c0a12;
+  --foreground: #f5f3ff;
+  --card: #161222;
+  --card-foreground: #f5f3ff;
+  --popover: #161222;
+  --popover-foreground: #f5f3ff;
+  --primary: #c4b5fd;
+  --primary-foreground: #1e1033;
+  --secondary: #241c33;
+  --secondary-foreground: #f3e8ff;
+  --muted: #241c33;
+  --muted-foreground: #c4b5fd;
+  --accent: #2e2150;
+  --accent-foreground: #f5f3ff;
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #c4b5fd;
+  --primary-glow: rgb(167 139 250 / 0.35);
 }
 
 @layer base {
@@ -76,7 +98,27 @@
   }
 
   ::selection {
-    background: #22c55e;
-    color: #05210f;
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  html[data-app-mode='tools'] body {
+    background-color: #0c0a12;
+    background-image: radial-gradient(circle at top, rgb(139 92 246 / 0.22), transparent 34rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

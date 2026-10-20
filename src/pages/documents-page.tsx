@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/context/auth-context'
-import { api, downloadLibraryDocument, uploadLibraryDocument, type OnlineDocument, type OnlineFolder } from '@/lib/api'
+import { api, downloadLibraryDocument, uploadLibraryDocument, type LibrarySearchPage, type OnlineDocument, type OnlineFolder } from '@/lib/api'
 import { downloadBlob, formatBytes, formatDate } from '@/lib/format'
 import { classifyFileName, folderMoveError, libraryFileError, type Classification } from '@/lib/library-rules'
 import { shareDocumentFile, shareFallbackNote, type ShareTarget } from '@/lib/library-share'
@@ -36,6 +36,15 @@ type Row = {
   favorite: boolean
   createdAt: number
   updatedAt: number
+  category?: string | null
+  categorySource?: string | null
+  categoryConfirmed?: boolean
+  textStatus?: string
+  notes?: string | null
+  tags?: string
+  dateValue?: string | null
+  dateLabel?: string | null
+  dateSource?: string | null
 }
 
 type PendingFile = {
@@ -44,6 +53,7 @@ type PendingFile = {
   folderId: string
   classification: Classification
   error: string | null
+  progress: number | null
 }
 
 const MODE_KEY = 'docsmio.library.mode'
@@ -75,7 +85,79 @@ function mapDocument(document: OnlineDocument): Row {
     favorite: document.favorite,
     createdAt: Date.parse(document.created_at),
     updatedAt: Date.parse(document.updated_at),
+    category: document.category,
+    categorySource: document.category_source,
+    categoryConfirmed: document.category_confirmed,
+    textStatus: document.text_status,
+    notes: document.notes,
+    tags: document.tags,
+    dateValue: document.date_value,
+    dateLabel: document.date_label,
+    dateSource: document.date_source,
   }
+}
+
+function OnlineDetails({ row, onSaved }: { row: Row; onSaved: () => Promise<void> }) {
+  const [notes, setNotes] = useState(row.notes ?? '')
+  const [tags, setTags] = useState(row.tags ?? '')
+  const [category, setCategory] = useState(row.category ?? '')
+  const [dateValue, setDateValue] = useState(row.dateValue ?? '')
+  const [dateLabel, setDateLabel] = useState(row.dateLabel ?? 'expiry')
+  const [message, setMessage] = useState('')
+
+  async function save() {
+    await api(`/api/library/documents/${row.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        notes,
+        tags,
+        category: category || undefined,
+        confirm_category: Boolean(category),
+        ...(dateValue ? { date_value: dateValue, date_label: dateLabel } : { clear_date: true }),
+      }),
+    })
+    setMessage('Saved. A category you type is kept if text is read again.')
+    await onSaved()
+  }
+
+  async function readImageText() {
+    setMessage('Reading text in this browser…')
+    const response = await fetch(`/api/library/documents/${row.id}/file`, { credentials: 'include', headers: { 'X-Docsmio-Request': '1' } })
+    if (!response.ok) throw new Error('The file could not be opened for text reading.')
+    const blob = await response.blob()
+    const { recognizeDocument } = await import('@/lib/ocr')
+    const result = await recognizeDocument(blob, 'eng')
+    await api(`/api/library/documents/${row.id}/text`, { method: 'POST', body: JSON.stringify({ text: result.text }) })
+    setMessage(result.warning ?? 'Text was saved for search on this account. It was not sent to an external AI service.')
+    await onSaved()
+  }
+
+  return (
+    <form className="mt-3 grid w-full gap-2 rounded-2xl border border-white/10 bg-black/20 p-3" onSubmit={(event) => { event.preventDefault(); void save().catch((caught: unknown) => setMessage(caught instanceof Error ? caught.message : 'Could not save.')) }}>
+      <label className="text-xs" htmlFor={`notes-${row.id}`}>Notes</label>
+      <textarea id={`notes-${row.id}`} className="min-h-20 rounded-xl border border-white/10 bg-transparent p-2 text-sm" value={notes} onChange={(event) => setNotes(event.target.value)} />
+      <label className="text-xs" htmlFor={`tags-${row.id}`}>Tags, separated by commas</label>
+      <Input id={`tags-${row.id}`} value={tags} onChange={(event) => setTags(event.target.value)} />
+      <label className="text-xs" htmlFor={`category-${row.id}`}>Category</label>
+      <Input id={`category-${row.id}`} value={category} onChange={(event) => setCategory(event.target.value)} />
+      <p className="text-xs text-muted-foreground">{row.categorySource === 'manual' ? 'You chose this category.' : row.categorySource === 'text' ? 'Suggested from extracted text.' : row.categorySource === 'filename' ? 'Suggested from the file name.' : 'No keyword match yet.'}</p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Input aria-label={`Date for ${row.name}`} type="date" value={dateValue} onChange={(event) => setDateValue(event.target.value)} />
+        <select aria-label={`Date label for ${row.name}`} className="h-11 rounded-full border border-white/10 bg-transparent px-3 text-sm" value={dateLabel} onChange={(event) => setDateLabel(event.target.value)}>
+          <option value="expiry">Expiry</option>
+          <option value="deadline">Deadline</option>
+          <option value="issued">Issued</option>
+          <option value="renewal">Renewal</option>
+        </select>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" size="sm">Save details</Button>
+        {row.mime.startsWith('image/') ? <Button type="button" size="sm" variant="outline" onClick={() => void readImageText().catch((caught: unknown) => setMessage(caught instanceof Error ? caught.message : 'Text could not be read.'))}>Read image text</Button> : null}
+        <Button type="button" size="sm" variant="outline" onClick={() => void api(`/api/library/documents/${row.id}/reprocess`, { method: 'POST' }).then(() => onSaved()).then(() => setMessage('Processing was run again.'))}>Retry text extraction</Button>
+      </div>
+      {message ? <p className="text-xs" role="status">{message}</p> : null}
+    </form>
+  )
 }
 
 export function DocumentsPage() {
@@ -101,6 +183,10 @@ export function DocumentsPage() {
   const [preview, setPreview] = useState<{ name: string; url: string; mime: string } | null>(null)
   const [moveTarget, setMoveTarget] = useState('')
   const [shareFor, setShareFor] = useState<string | null>(null)
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [searchRows, setSearchRows] = useState<Row[] | null>(null)
+  const [detailsFor, setDetailsFor] = useState<string | null>(null)
+  const [showTrash, setShowTrash] = useState(false)
   const preparedShare = useRef<{ id: string; file: File } | null>(null)
 
   function run(action: () => Promise<unknown>) {
@@ -128,7 +214,7 @@ export function DocumentsPage() {
       } else {
         const [nextFolders, nextDocuments] = await Promise.all([
           api<OnlineFolder[]>('/api/library/folders'),
-          api<OnlineDocument[]>('/api/library/documents'),
+          api<OnlineDocument[]>(`/api/library/documents?trash=${showTrash ? 'true' : 'false'}&limit=200`),
         ])
         setFolders(nextFolders.map(mapFolder))
         setDocuments(nextDocuments.map(mapDocument))
@@ -144,13 +230,41 @@ export function DocumentsPage() {
     void refresh()
     // Search and sort for the online library are applied again locally, so this reload follows the library mode.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, auth.user])
+  }, [mode, auth.user, showTrash])
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => setDebouncedQuery(query), 300)
+    return () => window.clearTimeout(handle)
+  }, [query])
+
+  useEffect(() => {
+    if (mode !== 'online' || !auth.user || !debouncedQuery.trim()) {
+      setSearchRows(null)
+      return
+    }
+    const params = new URLSearchParams({ q: debouncedQuery.trim(), page_size: '50', sort })
+    if (typeFilter === 'pdf' || typeFilter === 'image') params.set('mime', typeFilter)
+    if (folderId === 'favorites') params.set('favorite', 'true')
+    if (folderId !== 'all' && folderId !== 'favorites' && folderId !== 'recent') params.set('folder_id', folderId)
+    let cancel = false
+    void api<LibrarySearchPage>(`/api/library/search?${params.toString()}`)
+      .then((result) => {
+        if (!cancel) setSearchRows(result.items.map(mapDocument))
+      })
+      .catch((caught: unknown) => {
+        if (!cancel) setError(caught instanceof Error ? caught.message : 'Search failed.')
+      })
+    return () => {
+      cancel = true
+    }
+  }, [auth.user, debouncedQuery, folderId, mode, sort, typeFilter])
 
   useEffect(() => () => {
     if (preview) URL.revokeObjectURL(preview.url)
   }, [preview])
 
   const visible = useMemo(() => {
+    if (mode === 'online' && searchRows) return searchRows
     const needle = query.trim().toLowerCase()
     const folderName = (id: string) => folders.find((folder) => folder.id === id)?.name.toLowerCase() ?? ''
     const rows = documents.filter((document) => {
@@ -169,7 +283,7 @@ export function DocumentsPage() {
       return b.createdAt - a.createdAt
     })
     return folderId === 'recent' ? sorted.slice(0, 8) : sorted
-  }, [documents, folderId, folders, query, sort, typeFilter])
+  }, [documents, folderId, folders, mode, query, searchRows, sort, typeFilter])
 
   const recent = [...documents].sort((a, b) => b.createdAt - a.createdAt).slice(0, 4)
 
@@ -184,6 +298,7 @@ export function DocumentsPage() {
         folderId: match?.id ?? fallback?.id ?? folders[0]?.id ?? '',
         classification,
         error: libraryFileError(file),
+        progress: null,
       }
     })
     setPending((current) => [...current, ...next])
@@ -200,14 +315,21 @@ export function DocumentsPage() {
     try {
       for (const item of ready) {
         if (cancelImport.current) break
-        if (mode === 'local') {
-          await importDocument({ file: item.file, folderId: item.folderId, classification: item.classification })
-        } else {
-          await uploadLibraryDocument(item.file, item.file.name, item.folderId, item.classification.folderKey)
+        try {
+          if (mode === 'local') {
+            await importDocument({ file: item.file, folderId: item.folderId, classification: item.classification })
+          } else {
+            await uploadLibraryDocument(item.file, item.file.name, item.folderId, item.classification.folderKey, {
+              onProgress: (ratio) => setPending((current) => current.map((entry) => entry.key === item.key ? { ...entry, progress: ratio } : entry)),
+            })
+          }
+          setPending((current) => current.filter((entry) => entry.key !== item.key))
+        } catch (caught) {
+          const message = caught instanceof Error ? caught.message : 'This file was not saved.'
+          setPending((current) => current.map((entry) => entry.key === item.key ? { ...entry, error: message, progress: null } : entry))
         }
       }
-      setPending((current) => current.filter((item) => item.error))
-      setNotice(mode === 'local' ? 'Saved in this browser.' : 'Uploaded to your online library. Local copies were not changed.')
+      setNotice(mode === 'local' ? 'Saved in this browser.' : 'Confirmed uploads are in the online library. Local copies were not changed.')
       await refresh()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'The import stopped before every file was saved.')
@@ -218,7 +340,7 @@ export function DocumentsPage() {
 
   async function blobFor(row: Row): Promise<Blob> {
     if (mode === 'local') return readDocumentBlob(row.id)
-    const response = await fetch(`/api/library/documents/${row.id}/file`, { credentials: 'include' })
+    const response = await fetch(`/api/library/documents/${row.id}/file`, { credentials: 'include', headers: { 'X-Docsmio-Request': '1' } })
     if (!response.ok) throw new Error('The online file could not be opened.')
     return response.blob()
   }
@@ -283,11 +405,15 @@ export function DocumentsPage() {
   }
 
   async function removeRow(row: Row) {
-    const label = mode === 'local' ? 'Delete this file from this browser?' : 'Delete this file from your online library?'
+    const label = mode === 'local'
+      ? 'Delete this file from this browser?'
+      : showTrash
+        ? 'Delete this file permanently? The stored copy will be removed.'
+        : 'Move this file to trash? You can restore it from Trash.'
     if (!window.confirm(label)) return
     if (mode === 'local') await deleteDocument(row.id)
-    else await api(`/api/library/documents/${row.id}`, { method: 'DELETE' })
-    setNotice('Deleted.')
+    else await api(`/api/library/documents/${row.id}${showTrash ? '?purge=true' : ''}`, { method: 'DELETE' })
+    setNotice(showTrash || mode === 'local' ? 'Deleted.' : 'Moved to trash.')
     await refresh()
   }
 
@@ -380,7 +506,7 @@ export function DocumentsPage() {
   return (
     <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-8 lg:grid-cols-[240px_1fr] lg:px-6">
       <aside className="rounded-3xl border border-white/10 bg-[#101815] p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">Folders</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Folders</p>
         <div className="mt-3 grid gap-1">
           {[
             ['all', 'All documents'],
@@ -410,7 +536,10 @@ export function DocumentsPage() {
             <h1 className="text-3xl font-semibold tracking-tight">My Documents</h1>
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Organize PDFs and images in this browser, or copy chosen files to a private online library after you sign in.</p>
           </div>
-          <Button type="button" onClick={() => fileInput.current?.click()}><Upload className="size-4" /> Import</Button>
+          <div className="flex gap-2">
+            {mode === 'online' ? <Button type="button" variant="outline" onClick={() => setShowTrash((current) => !current)}>{showTrash ? 'Back to library' : 'Trash'}</Button> : null}
+            <Button type="button" onClick={() => fileInput.current?.click()}><Upload className="size-4" /> Import</Button>
+          </div>
           <input ref={fileInput} className="sr-only" type="file" multiple accept="application/pdf,image/jpeg,image/png,image/webp,.pdf,.jpg,.jpeg,.png,.webp" aria-label="Import documents" onChange={(event) => { queueFiles(Array.from(event.target.files ?? [])); event.target.value = '' }} />
         </div>
 
@@ -458,7 +587,7 @@ export function DocumentsPage() {
             <Button type="button" variant="outline" size="icon" aria-label="Grid view" onClick={() => setView('grid')}><LayoutGrid className="size-4" /></Button>
             <Button type="button" variant="outline" size="icon" aria-label="List view" onClick={() => setView('list')}><List className="size-4" /></Button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">This search checks file names, folder names, and file types. It does not search text inside documents.</p>
+          <p className="mt-2 text-xs text-muted-foreground">{mode === 'online' ? 'Online search checks names, folders, categories, tags, notes, and extracted text. A document marked “text not read yet” has not been indexed.' : 'Local search checks file names, folder names, and file types. It does not read text inside the file.'}</p>
         </div>
 
         {error ? <p className="mt-4 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100" role="alert">{error}</p> : null}
@@ -474,6 +603,7 @@ export function DocumentsPage() {
                     <p className="text-sm font-medium">{item.file.name}</p>
                     <p className="text-xs text-muted-foreground">{formatBytes(item.file.size)} · filename match · {item.classification.confidence} confidence · {item.classification.folderName}</p>
                     {item.error ? <p className="text-xs text-red-200">{item.error}</p> : null}
+                    {item.progress !== null ? <p className="text-xs text-muted-foreground">Uploading {Math.round(item.progress * 100)}%</p> : null}
                   </div>
                   <select aria-label={`Folder for ${item.file.name}`} className="h-10 rounded-xl border border-white/10 bg-transparent px-2 text-sm" value={item.folderId} onChange={(event) => setPending((current) => current.map((entry) => entry.key === item.key ? { ...entry, folderId: event.target.value } : entry))}>
                     {folders.map((folder) => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
@@ -549,8 +679,16 @@ export function DocumentsPage() {
                     <h3 className="truncate font-medium">{document.name}</h3>
                     <p className="mt-1 text-xs text-muted-foreground">{document.mime} · {formatBytes(document.size)} · {folder?.name ?? 'Missing folder'} · {mode === 'local' ? 'Local' : 'Online'}</p>
                     <p className="text-xs text-muted-foreground">Added {formatDate(document.createdAt)} · Updated {formatDate(document.updatedAt)}</p>
+                    {mode === 'online' ? (
+                      <p className="text-xs text-muted-foreground">
+                        {document.category ? `${document.categoryConfirmed ? 'Category' : 'Suggested category'}: ${document.category}` : 'No category'}
+                        {' · '}
+                        {document.textStatus === 'ready' ? 'Text indexed' : document.textStatus === 'pending' ? 'Text not read yet' : document.textStatus === 'failed' ? 'Text extraction failed' : 'No extracted text'}
+                        {document.dateValue ? ` · ${document.dateSource === 'suggested' ? 'Suggested date' : 'Date'} ${document.dateValue}` : ''}
+                      </p>
+                    ) : null}
                   </div>
-                  <button type="button" aria-label={document.favorite ? 'Remove favorite' : 'Mark favorite'} onClick={() => run(() => favoriteRow(document))} className={document.favorite ? 'text-emerald-300' : 'text-muted-foreground'}>
+                  <button type="button" aria-label={document.favorite ? 'Remove favorite' : 'Mark favorite'} onClick={() => run(() => favoriteRow(document))} className={document.favorite ? 'text-primary' : 'text-muted-foreground'}>
                     <Star className="size-4" />
                   </button>
                 </div>
@@ -577,6 +715,9 @@ export function DocumentsPage() {
                     {tools.map(([href, label]) => <option key={href} value={href}>{label}</option>)}
                   </select>
                   <Button type="button" size="sm" variant="destructive" onClick={() => run(() => removeRow(document))}><Trash2 className="size-3.5" /> Delete</Button>
+                  {mode === 'online' && showTrash ? <Button type="button" size="sm" variant="outline" onClick={() => run(async () => { await api(`/api/library/documents/${document.id}/restore`, { method: 'POST' }); setNotice('Restored.'); await refresh() })}>Restore</Button> : null}
+                  {mode === 'online' && !showTrash ? <Button type="button" size="sm" variant="outline" onClick={() => setDetailsFor((current) => current === document.id ? null : document.id)}>Details</Button> : null}
+                  {mode === 'online' && detailsFor === document.id ? <OnlineDetails row={document} onSaved={refresh} /> : null}
                 </div>
               </article>
             )

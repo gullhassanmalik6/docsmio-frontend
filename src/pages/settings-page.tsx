@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { AccountPrivacy } from '@/components/account-privacy'
 import { Notice } from '@/components/notice'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -56,6 +57,7 @@ export function SettingsPage() {
         <Button type="submit">Save changes</Button>
         {saved ? <Notice tone="success">Saved on this device.</Notice> : null}
       </form>
+      <AccountPrivacy />
     </div>
   )
 }

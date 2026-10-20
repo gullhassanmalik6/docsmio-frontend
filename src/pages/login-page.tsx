@@ -25,7 +25,7 @@ export function LoginPage() {
   const form = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: '', password: '' } })
   const mutation = useMutation({
     mutationFn: (values: LoginValues) => auth.login(values),
-    onSuccess: () => navigate('/files'),
+    onSuccess: () => navigate('/wallet'),
   })
 
   return (

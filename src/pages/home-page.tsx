@@ -50,21 +50,21 @@ const formats = [
 ]
 
 export function HomePage() {
-  usePageTitle('Docsmio — Smart Document Tool')
+  usePageTitle('Docsmio — Document Wallet')
   const popular = tools.filter((tool) => tool.status === 'ready').slice(0, 6)
 
   return (
     <div>
       <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:py-20">
         <div>
-          <p className="inline-flex items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-emerald-300">
-            SMART DOCUMENT TOOLS
+          <p className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-primary">
+            DOCUMENT WALLET
           </p>
           <h1 className="mt-5 max-w-xl text-4xl font-semibold tracking-tight sm:text-6xl sm:leading-[1.05]">
-            All Your Document Tools in <span className="text-primary">One Place</span>
+            One secure place for <span className="text-primary">your documents</span>
           </h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-            Resize, compress, convert, merge, and scan documents. Set a target size, check the real output, and export a new file.
+            Keep files, folders, and reminders in the wallet. Switch to tools when you want to resize, compress, merge, split, or scan. Those tools still run in this browser.
           </p>
           <ul className="mt-6 space-y-2">
             {checks.map((item) => (
@@ -76,13 +76,13 @@ export function HomePage() {
           </ul>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" asChild>
-              <Link to="/tools">
-                Explore Tools
+              <Link to="/wallet">
+                Open wallet
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link to="/features">Discover Features</Link>
+              <Link to="/tools">Open tools</Link>
             </Button>
           </div>
         </div>

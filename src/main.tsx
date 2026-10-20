@@ -3,6 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
+import { AppModeProvider } from './context/app-mode-context.tsx'
 import { HistoryProvider } from './context/history-context.tsx'
 import { AuthProvider } from './context/auth-context.tsx'
 import './index.css'
@@ -18,11 +19,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <HistoryProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </HistoryProvider>
+        <AppModeProvider>
+          <HistoryProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </HistoryProvider>
+        </AppModeProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,

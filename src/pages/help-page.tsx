@@ -16,7 +16,7 @@ const questions = [
   },
   {
     q: 'Does scan read the text?',
-    a: 'Yes, after you capture or upload an image. Tesseract.js reads it in this browser. Review the text, because OCR can be wrong. The image is not uploaded to Docsmio.',
+    a: 'The scan tool reads text in this browser with Tesseract.js. Review it, because OCR can be wrong. That scan is not uploaded. Online images can save a transcript to your account only after you choose Read image text. PDF text extraction uses the embedded text and does not send the file to an external AI service.',
   },
   {
     q: 'Do I need an account?',

@@ -3,17 +3,25 @@ import { useMemo, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Logo } from '@/components/layout/logo'
 import { Button } from '@/components/ui/button'
+import { useAppMode } from '@/context/app-mode-context'
 import { useAuth } from '@/context/auth-context'
 import { filterTools } from '@/lib/tools'
 import { cn } from '@/lib/utils'
 
-const links = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/documents', label: 'My Documents', end: false },
-  { to: '/tools', label: 'Tools', end: false },
+const walletLinks = [
+  { to: '/wallet', label: 'Dashboard', end: true },
+  { to: '/documents', label: 'Documents', end: false },
+  { to: '/reminders', label: 'Reminders', end: false },
+  { to: '/sharing', label: 'Sharing', end: false },
+  { to: '/settings', label: 'Settings', end: false },
+]
+
+const toolLinks = [
+  { to: '/tools', label: 'Tools', end: true },
+  { to: '/documents', label: 'Documents', end: false },
   { to: '/features', label: 'Features', end: false },
   { to: '/pricing', label: 'Pricing', end: false },
-  { to: '/blog', label: 'Blog', end: false },
+  { to: '/help', label: 'Help', end: false },
 ]
 
 function navClass(active: boolean) {
@@ -25,6 +33,8 @@ function navClass(active: boolean) {
 
 export function SiteHeader() {
   const auth = useAuth()
+  const { mode, toggleMode } = useAppMode()
+  const links = mode === 'wallet' ? walletLinks : toolLinks
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -53,6 +63,17 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-11"
+            aria-label={mode === 'wallet' ? 'Switch to tools mode' : 'Switch to wallet mode'}
+            onClick={toggleMode}
+          >
+            <span className="sm:hidden">{mode === 'wallet' ? 'Tools' : 'Wallet'}</span>
+            <span className="hidden sm:inline">{mode === 'wallet' ? 'Tools mode' : 'Wallet mode'}</span>
+          </Button>
           <Button variant="ghost" size="icon" aria-label="Search tools" onClick={() => setSearchOpen(true)}>
             <Search className="size-4" />
           </Button>

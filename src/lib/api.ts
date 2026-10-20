@@ -20,7 +20,16 @@ export type AccountUser = {
   created_at: string
   history_limit: number
   features: string[]
-  billing_connected: false
+  billing_connected: boolean
+  audience: string | null
+  timezone_name: string
+  onboarding_completed: boolean
+  notify_in_app: boolean
+  notify_email: boolean
+  quiet_start: string | null
+  quiet_end: string | null
+  storage_used_bytes: number
+  storage_quota_bytes: number
 }
 
 export type HistoryRecord = {
@@ -51,7 +60,8 @@ export function accountErrorMessage(error: unknown, fallback: string): string {
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
-  if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  headers.set('X-Docsmio-Request', '1')
+  if (init.body && !(init.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
   const response = await fetch(`${API_BASE}${path}`, { ...init, headers, credentials: 'include' })
   if (response.status === 204) return undefined as T
   const body = await response.json().catch(() => null)
@@ -83,8 +93,28 @@ export type OnlineDocument = {
   favorite: boolean
   classification_key: string | null
   classification_method: string | null
+  classification_confidence: string | null
+  category: string | null
+  category_source: string | null
+  category_confirmed: boolean
+  notes: string | null
+  tags: string
+  text_status: string
+  has_text: boolean
+  date_value: string | null
+  date_label: string | null
+  date_source: string | null
+  deleted_at: string | null
   created_at: string
   updated_at: string
+}
+
+export type LibrarySearchPage = {
+  items: OnlineDocument[]
+  page: number
+  page_size: number
+  total: number
+  note: string
 }
 
 async function readApiError(response: Response): Promise<never> {
@@ -96,19 +126,46 @@ async function readApiError(response: Response): Promise<never> {
   throw new ApiError(response.status, detail)
 }
 
-export function uploadLibraryDocument(file: Blob, filename: string, folderId: string, classificationKey: string | null) {
+export function uploadLibraryDocument(
+  file: Blob,
+  filename: string,
+  folderId: string,
+  classificationKey: string | null,
+  options: { onProgress?: (ratio: number) => void; signal?: AbortSignal } = {},
+) {
   const body = new FormData()
   body.set('folder_id', folderId)
   if (classificationKey) body.set('classification_key', classificationKey)
   body.set('upload', file, filename)
-  return fetch(`${API_BASE}/api/library/documents`, { method: 'POST', body, credentials: 'include' }).then(async (response) => {
-    if (!response.ok) await readApiError(response)
-    return response.json() as Promise<OnlineDocument>
+  return new Promise<OnlineDocument>((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', `${API_BASE}/api/library/documents`)
+    xhr.withCredentials = true
+    xhr.setRequestHeader('X-Docsmio-Request', '1')
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) options.onProgress?.(event.loaded / event.total)
+    }
+    xhr.onload = () => {
+      const payload = xhr.responseText ? (JSON.parse(xhr.responseText) as { detail?: string }) : null
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.responseText) as OnlineDocument)
+        return
+      }
+      const detail = payload && typeof payload.detail === 'string' ? payload.detail : 'The request failed.'
+      reject(new ApiError(xhr.status, detail))
+    }
+    xhr.onerror = () => reject(new ApiError(0, 'The connection was lost. This file was not confirmed.'))
+    xhr.onabort = () => reject(new ApiError(0, 'The upload was cancelled.'))
+    options.signal?.addEventListener('abort', () => xhr.abort(), { once: true })
+    xhr.send(body)
   })
 }
 
 export async function downloadLibraryDocument(id: string, filename: string) {
-  const response = await fetch(`${API_BASE}/api/library/documents/${id}/file`, { credentials: 'include' })
+  const response = await fetch(`${API_BASE}/api/library/documents/${id}/file`, {
+    credentials: 'include',
+    headers: { 'X-Docsmio-Request': '1' },
+  })
   if (!response.ok) await readApiError(response)
   const blob = await response.blob()
   downloadBlob(blob, filename)
